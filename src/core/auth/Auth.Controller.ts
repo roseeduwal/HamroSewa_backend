@@ -1,25 +1,27 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
-  Get,
   Post,
   Req,
   Res,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { instanceToPlain } from 'class-transformer';
 import { Response } from 'express';
-import { CurrentUser } from '../../lib/decorators/CurrentUser.Decorator';
 import { User } from '../user/entities/User.Entity';
 import { AuthService } from './Auth.Service';
 import { LogInDto } from './dto/LoginDto';
 import { SignUpDto } from './dto/SignUpDto';
+import { VerifyEmailDto } from './dto/VerifyEmailDto';
 import { JwtAuthGuard } from './guards/JwtAuth.Guard';
 import { LocalAuthGuard } from './guards/LocalAuth.Guard';
 
 @ApiTags('auth')
 @Controller('auth')
+@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -51,10 +53,15 @@ export class AuthController {
     return this.authService.signUp(signUpDto);
   }
 
+  @Post('verify-email')
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    return this.authService.verifyEmail(verifyEmailDto);
+  }
+
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Get('test')
-  test(@CurrentUser() user: number) {
-    return ['sup'];
+  @Post('sign-out')
+  async logout(@Res() response: Response) {
+    response.clearCookie('token').send();
   }
 }

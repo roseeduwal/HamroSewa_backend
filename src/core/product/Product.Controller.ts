@@ -30,7 +30,7 @@ export class ProductController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('productImage'))
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @hasRoles(UserRole.ADMIN)
+  @hasRoles(UserRole.Admin)
   @Post()
   create(
     @Body() createProductDto: CreateProductDto,

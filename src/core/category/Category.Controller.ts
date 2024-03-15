@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { hasRoles } from '../../lib/decorators/Roles.Decorator';
 import { JwtAuthGuard } from '../auth/guards/JwtAuth.Guard';
@@ -18,10 +26,15 @@ export class CategoryController {
   }
 
   @ApiBearerAuth()
-  @hasRoles(UserRole.ADMIN)
+  @hasRoles(UserRole.Admin)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
+  }
+
+  @Get(':id')
+  fetchDetail(@Param('id', ParseIntPipe) id: number) {
+    return this.categoryService.fetchDetail(id);
   }
 }

@@ -28,6 +28,7 @@ export class CategoryRepository {
     return this.repository
       .createQueryBuilder('c')
       .where('c.id = :id', { id })
+      .leftJoinAndSelect('c.products', 'products')
       .getOne();
   }
 
