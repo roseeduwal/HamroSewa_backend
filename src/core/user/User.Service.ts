@@ -4,8 +4,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/CreateUserDto';
 import { UserRepository } from './User.Repository';
+import { CreateUserDto } from './dto/CreateUserDto';
+import { UpdateUserDto } from './dto/UpdateUserDto';
 
 @Injectable()
 export class UserService {
@@ -43,5 +44,26 @@ export class UserService {
 
   async findOneBy(by: { email: string }) {
     return this.userRepository.findOneBy(by);
+  }
+
+  async update(id: number, updateUserPort: UpdateUserDto) {
+    try {
+      const existingUser = await this.userRepository.findOne(id);
+      if (!existingUser) {
+        throw new NotFoundException();
+      }
+      const user = await this.userRepository.update({
+        ...existingUser,
+        ...updateUserPort,
+      });
+      const updatedUser = await this.userRepository.findOne(user.id);
+      return updatedUser;
+    } catch (err) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
+
+  async createProfession(userId: number, professionId: number) {
+    return this.userRepository.createProfession(userId, professionId);
   }
 }

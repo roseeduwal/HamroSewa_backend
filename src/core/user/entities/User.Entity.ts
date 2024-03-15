@@ -1,11 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
-import { Column, Entity, Unique } from 'typeorm';
+import { Column, Entity, OneToMany, Unique } from 'typeorm';
 import { CoreEntity } from '../../../lib/utils/Base.Entity';
+import { UserProfessional } from './UserProfession.Entity';
 import { UserRole } from './UserRole.Enum';
 @Entity({ name: 'users' })
 @Unique(['email'])
 export class User extends CoreEntity {
+  @OneToMany(() => UserProfessional, (professional) => professional.user)
+  professions: UserProfessional[];
+
   @ApiProperty()
   @Column({ type: 'varchar', nullable: false })
   firstName: string;
@@ -20,10 +24,10 @@ export class User extends CoreEntity {
 
   @ApiProperty()
   @Column({ type: 'varchar', nullable: false })
-  contactNumber: number;
+  contactNumber: string;
 
   @ApiProperty()
-  @Column({ type: 'varchar', default: UserRole.USER })
+  @Column({ type: 'varchar', default: UserRole.User })
   role: UserRole;
 
   @Exclude()

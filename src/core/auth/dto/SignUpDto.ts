@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -42,9 +43,18 @@ export class SignUpDto {
 
   @ApiProperty({ required: true })
   @IsString()
-  @IsEnum(() => UserRole)
+  @IsEnum(UserRole)
   @IsOptional()
   role: UserRole;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  profession?: number;
+
+  @ApiHideProperty()
+  @IsBoolean()
+  @IsOptional()
+  isEmailVerified: boolean;
 
   @ApiProperty({ required: true })
   @IsString()

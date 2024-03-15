@@ -2,6 +2,7 @@ import {
   BadRequestException,
   HttpException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -9,7 +10,9 @@ import * as bcrypt from 'bcrypt';
 import { MailService } from '../../infra/mail/Mail.Service';
 import { UserService } from '../user/User.Service';
 import { User } from '../user/entities/User.Entity';
+import { UserRole } from '../user/entities/UserRole.Enum';
 import { SignUpDto } from './dto/SignUpDto';
+import { VerifyEmailDto } from './dto/VerifyEmailDto';
 
 @Injectable()
 export class AuthService {
@@ -56,11 +59,15 @@ export class AuthService {
         ...signUpDto,
         password: hashedPassword,
       });
+
+      if (user.role === UserRole.Professional) {
+        await this.userService.createProfession(user.id, signUpDto.profession);
+      }
       const token = this.jwtService.sign(
         { email: user.email },
         {
           secret: process.env.JWT_SECRET,
-          expiresIn: `10s`,
+          expiresIn: `1d`,
         },
       );
       await this.mailService.sendUserConfirmation(user, token);
@@ -72,6 +79,31 @@ export class AuthService {
         );
       }
       throw new HttpException(err.message, 500);
+    }
+  }
+
+  async verifyEmail(verifyEmailDto: VerifyEmailDto): Promise<User> {
+    try {
+      const payload = await this.jwtService.verify(verifyEmailDto.token, {
+        secret: process.env.JWT_SECRET,
+      });
+
+      if (typeof payload === 'object' && 'email' in payload) {
+        const user = await this.userService.findOneBy({ email: payload.email });
+
+        if (!user) {
+          throw new NotFoundException();
+        }
+        const updateUser = await this.userService.update(user.id, {
+          isEmailVerified: true,
+        });
+        return updateUser;
+      } else {
+        throw new UnauthorizedException();
+      }
+    } catch (err) {
+      console.log(err);
+      throw new UnauthorizedException();
     }
   }
 

@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
+import { BeforeInsert, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../../lib/utils/Base.Entity';
 import { Product } from '../../product/entities/Product.Entity';
+import { UserProfessional } from '../../user/entities/UserProfession.Entity';
 
 @Entity('categories')
 export class Category extends CoreEntity {
@@ -11,6 +12,9 @@ export class Category extends CoreEntity {
   @ApiProperty()
   @Column({ type: 'varchar', nullable: false })
   categoryName: string;
+
+  @ManyToOne(() => UserProfessional, (professional) => professional.category)
+  professional: UserProfessional;
 
   @BeforeInsert()
   capitalizeName(): void {

@@ -52,4 +52,15 @@ export class CategoryService {
       throw new HttpException('Something went wrong', 500);
     }
   }
+
+  async fetchDetail(id: number) {
+    try {
+      const detail = await this.categoryRepository.findOne(id);
+
+      if (!detail) throw new NotFoundException('Not found');
+      return detail;
+    } catch (err) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
 }
