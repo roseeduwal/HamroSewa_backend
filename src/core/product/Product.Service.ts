@@ -1,5 +1,6 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { FirebaseService } from '../../infra/firebase/FIrebase.Service';
+import { CartItemService } from '../cart-item/CartItem.Service';
 import { ProductRepository } from './Product.Repository';
 import { CreateProductDto } from './dto/CreateProductDto';
 
@@ -8,6 +9,7 @@ export class ProductService {
   constructor(
     private readonly productRepository: ProductRepository,
     private readonly firebaseService: FirebaseService,
+    private readonly cartItemService: CartItemService,
   ) {}
 
   async create(file: Express.Multer.File, createProductDto: CreateProductDto) {
@@ -26,7 +28,7 @@ export class ProductService {
 
       return newProduct;
     } catch (err) {
-      console.log(err);
+      err;
     }
   }
 
@@ -38,6 +40,7 @@ export class ProductService {
 
       return products;
     } catch (err) {
+      err;
       throw new HttpException('Something went wrong', 500);
     }
   }

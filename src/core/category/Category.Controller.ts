@@ -1,11 +1,13 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   Param,
   ParseIntPipe,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { hasRoles } from '../../lib/decorators/Roles.Decorator';
@@ -17,6 +19,7 @@ import { CreateCategoryDto } from './dto/CreateCategoryDto';
 
 @ApiTags('categories')
 @Controller('categories')
+@UseInterceptors(ClassSerializerInterceptor)
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 

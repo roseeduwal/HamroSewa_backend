@@ -37,7 +37,7 @@ export class UserService {
       const user = await this.userRepository.create(createUserDto);
       return user;
     } catch (err) {
-      console.log(err);
+      err;
       throw new BadRequestException();
     }
   }

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   UploadedFile,
   UseGuards,
@@ -33,6 +34,19 @@ export class ProductController {
   @hasRoles(UserRole.Admin)
   @Post()
   create(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFile() productImage: Express.Multer.File,
+  ) {
+    return this.productService.create(productImage, createProductDto);
+  }
+
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('productImage'))
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @hasRoles(UserRole.Admin)
+  @Patch()
+  update(
     @Body() createProductDto: CreateProductDto,
     @UploadedFile() productImage: Express.Multer.File,
   ) {

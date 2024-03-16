@@ -21,7 +21,7 @@ export class ProductRepository {
 
       return createdProduct;
     } catch (err) {
-      console.log('repo', err);
+      'repo', err;
       return null;
     }
   }
