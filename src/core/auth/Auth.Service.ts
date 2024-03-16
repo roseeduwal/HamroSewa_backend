@@ -102,7 +102,7 @@ export class AuthService {
         throw new UnauthorizedException();
       }
     } catch (err) {
-      console.log(err);
+      err;
       throw new UnauthorizedException();
     }
   }
