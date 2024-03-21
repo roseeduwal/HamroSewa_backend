@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Patch,
   Post,
   UploadedFile,
@@ -51,5 +54,13 @@ export class ProductController {
     @UploadedFile() productImage: Express.Multer.File,
   ) {
     return this.productService.create(productImage, createProductDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @hasRoles(UserRole.Admin)
+  @Delete(':id')
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.productService.delete(id);
   }
 }

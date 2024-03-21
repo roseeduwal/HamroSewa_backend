@@ -14,10 +14,12 @@ export class BookingItems extends CoreEntity {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
-  @ManyToOne(() => Booking, (order) => order.bookingItems)
+  @ManyToOne(() => Booking, (order) => order.bookingItems, {
+    onDelete: 'CASCADE',
+  })
   booking: Booking;
 
-  @ManyToOne(() => Product)
+  @ManyToOne(() => Product, { onDelete: 'CASCADE' })
   product: Product;
 
   @Column({ type: 'number' })

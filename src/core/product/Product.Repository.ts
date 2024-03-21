@@ -21,7 +21,6 @@ export class ProductRepository {
 
       return createdProduct;
     } catch (err) {
-      'repo', err;
       return null;
     }
   }
@@ -31,5 +30,16 @@ export class ProductRepository {
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.category', 'category')
       .getMany();
+  }
+
+  async findOne(id: number) {
+    return this.repository
+      .createQueryBuilder('p')
+      .where('p.id = :id', { id })
+      .getOne();
+  }
+
+  async softRemove(product: Product) {
+    await this.repository.softRemove(product);
   }
 }

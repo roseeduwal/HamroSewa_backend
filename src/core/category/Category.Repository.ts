@@ -47,4 +47,8 @@ export class CategoryRepository {
       .leftJoinAndSelect('c.products', 'products')
       .getMany();
   }
+
+  async softRemove(category: Category) {
+    await this.repository.delete(category.id);
+  }
 }

@@ -6,7 +6,9 @@ import { UserProfessional } from '../../user/entities/UserProfession.Entity';
 
 @Entity('categories')
 export class Category extends CoreEntity {
-  @OneToMany(() => Product, (product) => product.category)
+  @OneToMany(() => Product, (product) => product.category, {
+    onDelete: 'CASCADE',
+  })
   products: Product[];
 
   @ApiProperty()

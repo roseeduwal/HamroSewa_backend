@@ -40,7 +40,16 @@ export class ProductService {
 
       return products;
     } catch (err) {
-      err;
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
+
+  async delete(id: number) {
+    try {
+      const product = await this.productRepository.findOne(id);
+      if (!product) throw new NotFoundException();
+      await this.productRepository.softRemove(product);
+    } catch (err) {
       throw new HttpException('Something went wrong', 500);
     }
   }

@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -39,5 +40,13 @@ export class CategoryController {
   @Get(':id')
   fetchDetail(@Param('id', ParseIntPipe) id: number) {
     return this.categoryService.fetchDetail(id);
+  }
+
+  @ApiBearerAuth()
+  @hasRoles(UserRole.Admin)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Delete(':id')
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.categoryService.delete(id);
   }
 }

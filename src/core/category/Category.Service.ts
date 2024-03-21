@@ -63,4 +63,14 @@ export class CategoryService {
       throw new HttpException('Something went wrong', 500);
     }
   }
+
+  async delete(id: number) {
+    try {
+      const category = await this.categoryRepository.findOne(id);
+      if (!category) throw new NotFoundException();
+      await this.categoryRepository.softRemove(category);
+    } catch (err) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
 }
