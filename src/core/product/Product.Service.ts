@@ -67,9 +67,6 @@ export class ProductService {
       }
       const { category, ...restProduct } = product;
 
-      console.log('restProduct', restProduct);
-      console.log('updateProductDto', updateProductDto);
-
       const newProduct = await this.productRepository.update({
         ...restProduct,
         ...updateProductDto,
