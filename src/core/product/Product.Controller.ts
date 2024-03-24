@@ -19,6 +19,7 @@ import { RolesGuard } from '../auth/guards/Roles.Guard';
 import { UserRole } from '../user/entities/UserRole.Enum';
 import { ProductService } from './Product.Service';
 import { CreateProductDto } from './dto/CreateProductDto';
+import { UpdateProductDto } from './dto/UpdateProductDto';
 
 @ApiTags('products')
 @Controller('products')
@@ -44,16 +45,28 @@ export class ProductController {
   }
 
   @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @hasRoles(UserRole.Admin)
+  @Get(':id')
+  fetchDetail(@Param('id', ParseIntPipe) id: number) {
+    return this.productService.fetchDetail(id);
+  }
+
+  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('productImage'))
   @UseGuards(JwtAuthGuard, RolesGuard)
   @hasRoles(UserRole.Admin)
-  @Patch()
+  @Patch(':id')
   update(
-    @Body() createProductDto: CreateProductDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateProductDto: UpdateProductDto,
     @UploadedFile() productImage: Express.Multer.File,
   ) {
-    return this.productService.create(productImage, createProductDto);
+    return this.productService.update(id, {
+      productImage,
+      ...updateProductDto,
+    });
   }
 
   @ApiBearerAuth()

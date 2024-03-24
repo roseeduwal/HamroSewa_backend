@@ -23,7 +23,12 @@ export class CartItemService {
           id: itemExists.id,
           quantity: createCartItemDto.quantity,
         });
+
         if (!update) throw new BadRequestException();
+
+        if (update.quantity === 0) {
+          await this.cartItemRepository.softDelete(update.id);
+        }
         return update;
       }
 

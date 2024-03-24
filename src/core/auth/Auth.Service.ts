@@ -11,6 +11,7 @@ import { MailService } from '../../infra/mail/Mail.Service';
 import { UserService } from '../user/User.Service';
 import { User } from '../user/entities/User.Entity';
 import { UserRole } from '../user/entities/UserRole.Enum';
+import { changePasswordDto } from './dto/ChangepasswordDto';
 import { SignUpDto } from './dto/SignUpDto';
 import { VerifyEmailDto } from './dto/VerifyEmailDto';
 
@@ -102,7 +103,33 @@ export class AuthService {
         throw new UnauthorizedException();
       }
     } catch (err) {
-      err;
+      throw new UnauthorizedException();
+    }
+  }
+
+  async changePassword(changePasswordDto: changePasswordDto, userId: number) {
+    try {
+      const user = await this.userService.findOne(userId);
+
+      if (!user) throw new UnauthorizedException();
+
+      const isPassValid = await this.comparePassword(
+        changePasswordDto.currentPassword,
+        user.password,
+      );
+
+      if (!isPassValid)
+        throw new UnauthorizedException('Invalid email/password');
+
+      const hashedPassword = await this.hashPassword(
+        changePasswordDto.newPassword,
+      );
+
+      const updateUser = await this.userService.update(user.id, {
+        password: hashedPassword,
+      });
+      return updateUser;
+    } catch (err) {
       throw new UnauthorizedException();
     }
   }

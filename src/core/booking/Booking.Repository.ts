@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UserTypeParamDto } from '../../lib/utils/UserTypeParamDto';
 import { UserRole } from '../user/entities/UserRole.Enum';
 import { Booking } from './entities/Booking.Entity';
-import { UserTypeParamDto } from './entities/UserTypePramDto';
 
 @Injectable()
 export class BookingRepository {
@@ -17,10 +17,19 @@ export class BookingRepository {
         this.repository.create(booking),
       );
       if (!newBooking) return null;
-      return newBooking;
+      return this.findOne(newBooking.id);
     } catch (err) {
       return null;
     }
+  }
+
+  async findOne(id: number) {
+    return this.repository
+      .createQueryBuilder('b')
+      .where('b.id = :id', { id })
+      .leftJoinAndSelect('b.bookingItems', 'bookingItems')
+      .leftJoinAndSelect('bookingItems.product', 'product')
+      .getOne();
   }
 
   async find(userType: UserTypeParamDto, userId: number) {
@@ -28,12 +37,27 @@ export class BookingRepository {
       .createQueryBuilder('b')
       .leftJoinAndSelect('b.bookingItems', 'bookingItems')
       .leftJoinAndSelect('bookingItems.product', 'product')
-      .leftJoin('b.user', 'user');
-
+      .leftJoinAndSelect('b.professional', 'professional')
+      .leftJoinAndSelect('b.payment', 'payment')
+      .leftJoinAndSelect('professional.user', 'professionalUser');
     if (userType.userType === UserRole.User) {
       query.where('b.userId = :userId', { userId });
+    } else {
+      query.leftJoinAndSelect('b.user', 'user');
     }
 
     return query.getMany();
+  }
+
+  async update(booking: Partial<Booking>) {
+    try {
+      const preloaded = await this.repository.preload({ ...booking });
+      const update = await this.repository.save({ ...preloaded });
+      if (!update) return null;
+
+      return update;
+    } catch (err) {
+      return null;
+    }
   }
 }

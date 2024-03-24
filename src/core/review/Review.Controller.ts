@@ -3,9 +3,6 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Get,
-  Param,
-  ParseIntPipe,
-  Patch,
   Post,
   Query,
   UseGuards,
@@ -18,25 +15,24 @@ import { UserTypeParamDto } from '../../lib/utils/UserTypeParamDto';
 import { JwtAuthGuard } from '../auth/guards/JwtAuth.Guard';
 import { RolesGuard } from '../auth/guards/Roles.Guard';
 import { UserRole } from '../user/entities/UserRole.Enum';
-import { BookingService } from './Booking.Service';
-import { CreateBookingDto } from './dto/CreateBookingDto';
-import { UpdateBookingDto } from './dto/UpdateBookingDto';
+import { ReviewService } from './Review.Service';
+import { CreateReviewDto } from './dto/CreateReviewDto';
 
-@ApiTags('bookings')
-@Controller('bookings')
+@Controller('reviews')
+@ApiTags('reviews')
 @UseInterceptors(ClassSerializerInterceptor)
-export class BookingController {
-  constructor(private readonly bookingService: BookingService) {}
+export class ReviewController {
+  constructor(private readonly reviewService: ReviewService) {}
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @hasRoles(UserRole.User)
   @Post()
   create(
-    @Body() createBookingDto: CreateBookingDto,
+    @Body() createReviewDto: CreateReviewDto,
     @CurrentUser() userId: number,
   ) {
-    return this.bookingService.create(createBookingDto, userId);
+    return this.reviewService.create(userId, createReviewDto);
   }
 
   @ApiBearerAuth()
@@ -44,17 +40,6 @@ export class BookingController {
   @hasRoles(UserRole.User, UserRole.Admin)
   @Get()
   fetch(@Query() userType: UserTypeParamDto, @CurrentUser() userId: number) {
-    return this.bookingService.fetch(userType, userId);
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @hasRoles(UserRole.Admin)
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateBookingDto: UpdateBookingDto,
-  ) {
-    return this.bookingService.update(id, updateBookingDto);
+    return this.reviewService.fetch(userType, userId);
   }
 }

@@ -3,6 +3,7 @@ import { FirebaseService } from '../../infra/firebase/FIrebase.Service';
 import { CartItemService } from '../cart-item/CartItem.Service';
 import { ProductRepository } from './Product.Repository';
 import { CreateProductDto } from './dto/CreateProductDto';
+import { UpdateProductDto } from './dto/UpdateProductDto';
 
 @Injectable()
 export class ProductService {
@@ -41,6 +42,44 @@ export class ProductService {
       return products;
     } catch (err) {
       throw new HttpException('Something went wrong', 500);
+    }
+  }
+
+  async fetchDetail(id: number) {
+    try {
+      const productDetail = await this.productRepository.findOne(id);
+      if (!productDetail) throw new NotFoundException();
+      return productDetail;
+    } catch (err) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
+
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    try {
+      const product = await this.productRepository.findOne(id);
+      if (!product) throw new NotFoundException();
+      if (updateProductDto.productImage) {
+        product.productImageUrl = await this.firebaseService.uploadFile(
+          updateProductDto.productImage,
+          'product-images',
+        );
+      }
+      const { category, ...restProduct } = product;
+
+      console.log('restProduct', restProduct);
+      console.log('updateProductDto', updateProductDto);
+
+      const newProduct = await this.productRepository.update({
+        ...restProduct,
+        ...updateProductDto,
+      });
+
+      if (!newProduct) throw new NotFoundException();
+
+      return newProduct;
+    } catch (err) {
+      console.log(err);
     }
   }
 

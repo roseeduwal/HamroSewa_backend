@@ -29,6 +29,8 @@ export class CategoryRepository {
       .createQueryBuilder('c')
       .where('c.id = :id', { id })
       .leftJoinAndSelect('c.products', 'products')
+      .leftJoinAndSelect('products.reviews', 'reviews')
+
       .getOne();
   }
 
@@ -46,6 +48,20 @@ export class CategoryRepository {
       .createQueryBuilder('c')
       .leftJoinAndSelect('c.products', 'products')
       .getMany();
+  }
+
+  async update(category: Partial<Category>) {
+    try {
+      const preloaded = await this.repository.preload({ ...category });
+      const updateCategory = await this.repository.save({ ...preloaded });
+      if (!updateCategory) {
+        return null;
+      }
+
+      return this.findOne(updateCategory.id);
+    } catch (err) {
+      return null;
+    }
   }
 
   async softRemove(category: Category) {

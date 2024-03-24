@@ -24,4 +24,11 @@ export class Category extends CoreEntity {
       this.categoryName[0].toUpperCase() +
       this.categoryName.toLowerCase().slice(1);
   }
+
+  //virtual property
+  @ApiProperty()
+  bookings: number;
+
+  @ApiProperty()
+  rating: number;
 }

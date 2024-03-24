@@ -1,4 +1,14 @@
-import { PartialType } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 import { CreateProductDto } from './CreateProductDto';
 
-export class UpdateProduct extends PartialType(CreateProductDto) {}
+export class UpdateProductDto extends PartialType(CreateProductDto) {
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  productImageUrl?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  bookings?: number;
+}

@@ -59,7 +59,6 @@ export class CartItemRepository {
 
       return this.findOne(updateCartItem.id);
     } catch (err) {
-      err;
       return null;
     }
   }

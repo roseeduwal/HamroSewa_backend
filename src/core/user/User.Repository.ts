@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UserTypeParamDto } from '../../lib/utils/UserTypeParamDto';
 import { User } from './entities/User.Entity';
 import { UserProfessional } from './entities/UserProfession.Entity';
+import { UserRole } from './entities/UserRole.Enum';
 
 @Injectable()
 export class UserRepository {
@@ -23,6 +25,27 @@ export class UserRepository {
     } catch (err) {
       return null;
     }
+  }
+
+  async find(userType: UserTypeParamDto) {
+    const query = this.repository.createQueryBuilder('u');
+    if (userType.userType === UserRole.User) {
+      query.where('u.role = :role', { role: userType.userType });
+    } else {
+      query.where('u.role = :role', { role: userType.userType });
+    }
+    return query.getMany();
+  }
+
+  async fetchProfessionals() {
+    const query = this.professionRepository.createQueryBuilder('p');
+    query
+      .leftJoinAndSelect('p.user', 'user')
+      .andWhere('user.isEmailVerified = :isEmailVerified', {
+        isEmailVerified: true,
+      });
+
+    return query.getMany();
   }
 
   async findOne(id: number) {

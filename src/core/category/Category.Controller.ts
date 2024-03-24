@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
   UseInterceptors,
@@ -17,6 +18,7 @@ import { RolesGuard } from '../auth/guards/Roles.Guard';
 import { UserRole } from '../user/entities/UserRole.Enum';
 import { CategoryService } from './Category.Service';
 import { CreateCategoryDto } from './dto/CreateCategoryDto';
+import { UpdateCategoryDto } from './dto/UpdateCategoryDto';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -35,6 +37,17 @@ export class CategoryController {
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
+  }
+
+  @ApiBearerAuth()
+  @hasRoles(UserRole.Admin)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    return this.categoryService.update(id, updateCategoryDto);
   }
 
   @Get(':id')

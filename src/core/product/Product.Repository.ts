@@ -32,10 +32,24 @@ export class ProductRepository {
       .getMany();
   }
 
+  async update(product: Partial<Product>) {
+    try {
+      const preloaded = await this.repository.preload({ ...product });
+      const updateProduct = await this.repository.save({ ...preloaded });
+
+      if (!updateProduct) return null;
+      return updateProduct;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
+
   async findOne(id: number) {
     return this.repository
       .createQueryBuilder('p')
       .where('p.id = :id', { id })
+      .leftJoinAndSelect('p.category', 'category')
       .getOne();
   }
 

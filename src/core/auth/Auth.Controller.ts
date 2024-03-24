@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Patch,
   Post,
   Req,
   Res,
@@ -11,8 +12,10 @@ import {
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { instanceToPlain } from 'class-transformer';
 import { Response } from 'express';
+import { CurrentUser } from '../../lib/decorators/CurrentUser.Decorator';
 import { User } from '../user/entities/User.Entity';
 import { AuthService } from './Auth.Service';
+import { changePasswordDto } from './dto/ChangepasswordDto';
 import { LogInDto } from './dto/LoginDto';
 import { SignUpDto } from './dto/SignUpDto';
 import { VerifyEmailDto } from './dto/VerifyEmailDto';
@@ -56,6 +59,16 @@ export class AuthController {
   @Post('verify-email')
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     return this.authService.verifyEmail(verifyEmailDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  async changePassword(
+    @Body() changePasswordDto: changePasswordDto,
+    @CurrentUser() userId: number,
+  ) {
+    return this.authService.changePassword(changePasswordDto, userId);
   }
 
   @ApiBearerAuth()
