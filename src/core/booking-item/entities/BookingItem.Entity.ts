@@ -4,7 +4,7 @@ import { CoreEntity } from '../../../lib/utils/Base.Entity';
 import { Booking } from '../../booking/entities/Booking.Entity';
 import { Product } from '../../product/entities/Product.Entity';
 
-@Entity('bookingItems')
+@Entity('booking-items')
 export class BookingItems extends CoreEntity {
   @ApiProperty()
   @Column({ type: 'int' })

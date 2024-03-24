@@ -4,7 +4,7 @@ import { CoreEntity } from '../../../lib/utils/Base.Entity';
 import { Product } from '../../product/entities/Product.Entity';
 import { User } from '../../user/entities/User.Entity';
 
-@Entity('cartItems')
+@Entity('cart-items')
 export class CartItem extends CoreEntity {
   @ApiProperty()
   @Column({ type: 'int', nullable: false })
