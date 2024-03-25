@@ -111,7 +111,7 @@ export class AuthService {
     try {
       const user = await this.userService.findOne(userId);
 
-      if (!user) throw new UnauthorizedException();
+      if (!user) throw new UnauthorizedException("User doesn't exist");
 
       const isPassValid = await this.comparePassword(
         changePasswordDto.currentPassword,
@@ -126,6 +126,7 @@ export class AuthService {
       );
 
       const updateUser = await this.userService.update(user.id, {
+        ...user,
         password: hashedPassword,
       });
       return updateUser;

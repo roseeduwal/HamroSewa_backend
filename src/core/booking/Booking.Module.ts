@@ -16,5 +16,6 @@ import { BookingDIToken } from './BookingDIToken';
   ],
   providers: [BookingService, BookingRepository],
   controllers: [BookingController],
+  exports: [BookingService],
 })
 export class BookingModule {}

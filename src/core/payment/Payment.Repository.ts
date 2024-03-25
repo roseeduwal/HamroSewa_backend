@@ -22,6 +22,13 @@ export class PaymentRepository {
     }
   }
 
+  async find() {
+    return this.repository
+      .createQueryBuilder('p')
+      .leftJoinAndSelect('p.user', 'user')
+      .leftJoinAndSelect('p.booking', 'booking')
+      .getMany();
+  }
   async findOne(id: number) {
     return this.repository
       .createQueryBuilder('p')
@@ -41,6 +48,18 @@ export class PaymentRepository {
     } catch (err) {
       return null;
     }
+  }
+
+  async findByUserId(userId: number) {
+    return this.repository
+      .createQueryBuilder('p')
+      .where('p.userId = :userId', { userId })
+
+      .getMany();
+  }
+
+  async deleteMultiple(payments: Payment[]) {
+    await this.repository.softRemove(payments);
   }
 
   async findBy(by: { pidx: string }) {

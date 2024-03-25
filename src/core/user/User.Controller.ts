@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -63,14 +64,11 @@ export class UserController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @hasRoles(UserRole.Admin)
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.userService.update(id, updateUserDto);
+  @UseGuards(JwtAuthGuard)
+  @Patch()
+  update(@Body() updateUserDto: UpdateUserDto, @CurrentUser() userId: number) {
+    console.log(updateUserDto);
+    return this.userService.update(userId, updateUserDto);
   }
 
   @ApiBearerAuth()
@@ -79,5 +77,13 @@ export class UserController {
   @Get('professionals')
   fetchProfessionals() {
     return this.userService.fetchProfessionals();
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @hasRoles(UserRole.Admin)
+  @Delete(':id')
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.remove(id);
   }
 }

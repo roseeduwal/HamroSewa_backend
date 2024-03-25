@@ -67,6 +67,7 @@ export class UserRepository {
       const preloaded = await this.repository.preload({ ...user });
 
       const updatedUser = await this.repository.save({ ...preloaded });
+
       if (!updatedUser) {
         return null;
       }
@@ -89,5 +90,9 @@ export class UserRepository {
     } catch (err) {
       return null;
     }
+  }
+
+  async softRemove(user: Partial<User>) {
+    await this.repository.softRemove(user);
   }
 }

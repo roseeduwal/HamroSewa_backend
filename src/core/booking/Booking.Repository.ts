@@ -32,6 +32,13 @@ export class BookingRepository {
       .getOne();
   }
 
+  async findBy(by: { userId: number }) {
+    return this.repository
+      .createQueryBuilder('b')
+      .where('b.user = :userId', { userId: by.userId })
+      .getMany();
+  }
+
   async find(userType: UserTypeParamDto, userId: number) {
     const query = this.repository
       .createQueryBuilder('b')
@@ -59,5 +66,13 @@ export class BookingRepository {
     } catch (err) {
       return null;
     }
+  }
+
+  async deleteMultiple(bookings: Booking[]) {
+    await this.repository.softRemove(bookings);
+  }
+
+  async softRemove(booking: Partial<Booking>) {
+    await this.repository.softRemove(booking);
   }
 }

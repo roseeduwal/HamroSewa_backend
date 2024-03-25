@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -56,5 +57,13 @@ export class BookingController {
     @Body() updateBookingDto: UpdateBookingDto,
   ) {
     return this.bookingService.update(id, updateBookingDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @hasRoles(UserRole.User, UserRole.Admin)
+  @Delete(':id')
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.bookingService.remove(id);
   }
 }

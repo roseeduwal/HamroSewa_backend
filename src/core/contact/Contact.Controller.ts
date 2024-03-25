@@ -12,28 +12,25 @@ import { hasRoles } from '../../lib/decorators/Roles.Decorator';
 import { JwtAuthGuard } from '../auth/guards/JwtAuth.Guard';
 import { RolesGuard } from '../auth/guards/Roles.Guard';
 import { UserRole } from '../user/entities/UserRole.Enum';
-import { PaymentService } from './Payment.Service';
-import { ValidatePaymentDto } from './dto/ValidatePaymentDto';
+import { ContactService } from './Contact.Service';
+import { CreateContactDto } from './dto/CreateContactDto';
 
-@ApiTags('payments')
-@Controller('payments')
+@ApiTags('contacts')
+@Controller('contacts')
 @UseInterceptors(ClassSerializerInterceptor)
-export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+export class ContactController {
+  constructor(private readonly contactService: ContactService) {}
+
+  @Post()
+  create(@Body() createContactDto: CreateContactDto) {
+    return this.contactService.create(createContactDto);
+  }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @hasRoles(UserRole.Admin)
   @Get()
   fetch() {
-    return this.paymentService.fetch();
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @hasRoles(UserRole.User)
-  @Post('validate')
-  verify(@Body() validate: ValidatePaymentDto) {
-    return this.paymentService.validate(validate);
+    return this.contactService.fetch();
   }
 }

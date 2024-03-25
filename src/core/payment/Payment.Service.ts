@@ -38,11 +38,33 @@ export class PaymentService {
 
         await this.paymentRepository.create({
           ...newPayment,
-          pidx: response.pidx,
+          pidx: response.data.pidx,
         });
         return response.data;
       }
       return newPayment;
+    } catch (err) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
+
+  async deleteMultiple(by: { userId: number }) {
+    try {
+      const bookings = await this.paymentRepository.findByUserId(by.userId);
+
+      if (!bookings) throw new NotFoundException();
+      await this.paymentRepository.deleteMultiple(bookings);
+    } catch (err) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
+
+  async fetch() {
+    try {
+      const payments = await this.paymentRepository.find();
+      if (!payments) throw new NotFoundException();
+
+      return payments;
     } catch (err) {
       throw new HttpException('Something went wrong', 500);
     }

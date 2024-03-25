@@ -4,8 +4,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FirebaseService } from '../../infra/firebase/FIrebase.Service';
 import { UserTypeParamDto } from '../../lib/utils/UserTypeParamDto';
+import { USER_DELETE } from '../event-listerner/UserEventListener.Service';
 import { UserRepository } from './User.Repository';
 import { CreateUserDto } from './dto/CreateUserDto';
 import { UpdateUserDto } from './dto/UpdateUserDto';
@@ -15,6 +17,7 @@ export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly firebaseService: FirebaseService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async fetch(userType: UserTypeParamDto) {
@@ -99,7 +102,15 @@ export class UserService {
 
   async update(id: number, updateUserPort: UpdateUserDto) {
     try {
-      const existingUser = await this.userRepository.findOne(id);
+      const existingUser = await this.userRepository.findOneBy({
+        email: updateUserPort.email,
+      });
+      console.log(existingUser);
+      const emailExist = await this.userRepository.findOneBy({
+        email: updateUserPort.email,
+      });
+
+      if (existingUser.id !== id && emailExist) throw new BadRequestException();
       if (!existingUser) {
         throw new NotFoundException();
       }
@@ -110,11 +121,29 @@ export class UserService {
       const updatedUser = await this.userRepository.findOne(user.id);
       return updatedUser;
     } catch (err) {
+      console.log(err);
+      if (err instanceof BadRequestException)
+        throw new BadRequestException('Email already exists');
       throw new HttpException('Something went wrong', 500);
     }
   }
 
   async createProfession(userId: number, professionId: number) {
     return this.userRepository.createProfession(userId, professionId);
+  }
+
+  async remove(id: number) {
+    try {
+      const user = await this.userRepository.findOne(id);
+
+      if (!user) throw new NotFoundException();
+
+      await this.userRepository.softRemove(user);
+      this.eventEmitter.emitAsync(USER_DELETE, user);
+    } catch (err) {
+      if (err instanceof NotFoundException)
+        throw new NotFoundException('User not found');
+      throw new HttpException('Something went wrong', 500);
+    }
   }
 }

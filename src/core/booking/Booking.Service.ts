@@ -71,7 +71,19 @@ export class BookingService {
       });
       return bookings;
     } catch (err) {
-      console.log(err);
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
+
+  async deleteMultiple(by: { userId: number }) {
+    try {
+      const bookings = await this.bookingRepository.findBy({
+        userId: by.userId,
+      });
+
+      if (!bookings) throw new NotFoundException();
+      await this.bookingRepository.deleteMultiple(bookings);
+    } catch (err) {
       throw new HttpException('Something went wrong', 500);
     }
   }
@@ -89,6 +101,20 @@ export class BookingService {
       if (!updateBooking) throw new NotFoundException();
       return updateBooking;
     } catch (err) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
+
+  async remove(id: number) {
+    try {
+      const booking = await this.bookingRepository.findOne(id);
+
+      if (!booking) throw new NotFoundException();
+
+      await this.bookingRepository.softRemove(booking);
+    } catch (err) {
+      if (err instanceof NotFoundException)
+        throw new NotFoundException('Booking not found');
       throw new HttpException('Something went wrong', 500);
     }
   }

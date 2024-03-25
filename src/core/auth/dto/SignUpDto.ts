@@ -16,7 +16,6 @@ export class SignUpDto {
   @ApiProperty({ required: true })
   @IsString()
   @IsNotEmpty()
-  @MinLength(1)
   firstName: string;
 
   @ApiProperty({ required: false })
